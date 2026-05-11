@@ -1,18 +1,18 @@
 services:
   backend:
-    image: visvirideveloper/nombreDelProyecto-back:latest
+    image: visvirideveloper/nombredelproyecto-back:latest
     ports:
       - "3000:3000"
     restart: always
   
   db:
-    image: visvirideveloper/nombreDelProyecto-db:latest
+    image: visvirideveloper/nombredelproyecto-db:latest
     ports:
       - "3306:3306"
     restart: always
 
   frontend:
-    image: visvirideveloper/nombreDelProyecto-front:latest
+    image: visvirideveloper/nombredelproyecto-front:latest
     ports:
       - "3000:80"
     restart: always
