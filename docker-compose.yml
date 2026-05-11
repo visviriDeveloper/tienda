@@ -1,0 +1,18 @@
+services:
+  backend:
+    image: visvirideveloper/petstore:latest
+    ports:
+      - "3000:3000"
+    restart: always
+  
+  db:
+    image: visvirideveloper/petstore:latest
+    ports:
+      - "3306:3306"
+    restart: always
+
+  frontend:
+    image: visvirideveloper/petstore:latest
+    ports:
+      - "3000: 3000"
+    restart: always
