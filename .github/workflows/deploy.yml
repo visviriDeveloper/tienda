@@ -1,24 +1,66 @@
-name: CI/CD Pipeline PetStore
+name: CI/CD Pipeline proyecto
 
 on:
   push:
     branches: [main]
 
 jobs:
-  build-and-push:
+  # 1. Database Image
+  build-db:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout del código
-        uses: actions/checkout@v4
-
-      - name: Login en Docker Hub
-        uses: docker/login-action@v4
+      - uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
-          username: ${{secrets.DOCKERHUB_USERNAME}}
-          password: ${{secrets.DOCKERHUB_PASSWORD}}
-
-      - name: Construir y subir imagen
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and Push DB
         uses: docker/build-push-action@v5
         with:
+          context: ./db
           push: true
-          tags: ${{secrets.DOCKERHUB_USERNAME}}/petstore:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/nombreDelProyecto-db:latest
+
+  # 2. Backend Image (Port 3001)
+  build-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and Push Backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/nombreDelProyecto-back:latest
+
+  # 3. Frontend Image (Port 3000)
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and Push Frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/nombreDelProyecto-front:latest
+
+  # 4. Deploy using Docker Compose
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build-db, build-backend, build-frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy with Docker Compose
+        run: docker compose up -d
